@@ -1,0 +1,73 @@
+{
+  "kind": "collectionType",
+  "collectionName": "recipes",
+  "info": {
+    "singularName": "recipe",
+    "pluralName": "recipes",
+    "displayName": "Recipe",
+    "description": "A gluten-free recipe"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "ingredients": {
+      "type": "richtext",
+      "required": true
+    },
+    "instructions": {
+      "type": "richtext",
+      "required": true
+    },
+    "preparationTime": {
+      "type": "integer",
+      "required": false,
+      "min": 0
+    },
+    "cookingTime": {
+      "type": "integer",
+      "required": false,
+      "min": 0
+    },
+    "servings": {
+      "type": "integer",
+      "required": false,
+      "min": 1,
+      "default": 1
+    },
+    "difficulty": {
+      "type": "enumeration",
+      "enum": ["easy", "medium", "hard"],
+      "default": "medium"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["dessert", "cake", "cookies", "bread", "pastry", "other"],
+      "default": "dessert"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    }
+  }
+}
