@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "recepts",
+  "info": {
+    "singularName": "recept",
+    "pluralName": "recepts",
+    "displayName": "Recept"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Naslov": {
+      "type": "string"
+    },
+    "Slug": {
+      "type": "uid",
+      "targetField": "Naslov"
+    },
+    "KratkiOpis": {
+      "type": "string"
+    },
+    "Opis": {
+      "type": "richtext"
+    },
+    "Sastojci": {
+      "type": "richtext"
+    },
+    "Priprema": {
+      "type": "richtext"
+    },
+    "Istaknuto": {
+      "type": "boolean"
+    },
+    "Slika": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Datum": {
+      "type": "datetime"
+    },
+    "Autor": {
+      "type": "string"
+    },
+    "Kategorijas": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::kategorija.kategorija",
+      "inversedBy": "recepts"
+    },
+    "Tip": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "slano",
+        "slatko"
+      ]
+    }
+  }
+}

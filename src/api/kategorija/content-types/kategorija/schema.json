@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "kategorijas",
+  "info": {
+    "singularName": "kategorija",
+    "pluralName": "kategorijas",
+    "displayName": "Kategorija"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Naziv": {
+      "type": "string"
+    },
+    "Slug": {
+      "type": "uid",
+      "targetField": "Naziv"
+    },
+    "Opis": {
+      "type": "string"
+    },
+    "recepts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::recept.recept",
+      "mappedBy": "Kategorijas"
+    },
+    "Tip": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "slatko",
+        "slano"
+      ]
+    }
+  }
+}
