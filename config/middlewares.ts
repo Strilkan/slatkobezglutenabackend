@@ -1,11 +1,18 @@
-export default [
+export default ({ env }) => [
   "strapi::logger",
   "strapi::errors",
   {
     name: "strapi::cors",
     config: {
       enabled: true,
-      origin: ["http://localhost:3000", "http://localhost:1337"], // ✅ dozvoli React app i admin
+      origin: [
+        "http://localhost:3000", 
+        "http://localhost:1337",
+        env("FRONTEND_URL", "https://slatkobezglutenabackend.onrender.com"), // Frontend URL from env or default
+        /^https?:\/\/.*\.onrender\.com$/, // Render.com subdomains
+        /^https?:\/\/.*\.vercel\.app$/, // Vercel deployments
+        /^https?:\/\/.*\.netlify\.app$/, // Netlify deployments
+      ],
       headers: "*",
       credentials: true,
     },

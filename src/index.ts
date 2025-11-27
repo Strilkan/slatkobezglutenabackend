@@ -118,6 +118,11 @@ export default {
           { action: 'api::kategorija.kategorija.create', enabled: true },
           { action: 'api::kategorija.kategorija.update', enabled: true },
           { action: 'api::kategorija.kategorija.delete', enabled: true },
+          // Upload permissions
+          { action: 'plugin::upload.read', enabled: true },
+          { action: 'plugin::upload.assets.create', enabled: true },
+          { action: 'plugin::upload.assets.update', enabled: true },
+          { action: 'plugin::upload.assets.download', enabled: true },
         ];
 
         await strapi
