@@ -68,13 +68,19 @@ export default factories.createCoreController("api::putovanja.putovanja", ({ str
       // Use documentId for update
       const updateId = entity.documentId || entity.id;
       
+      console.log(`Updating putovanja ${updateId} (original ID: ${id}) with data:`, ctx.request.body.data);
+      
       // Update with documentId
       const updated = await strapi.entityService.update("api::putovanja.putovanja", updateId, {
         data: ctx.request.body.data,
         populate: ctx.query.populate || "*",
       });
 
-      return { data: updated };
+      console.log(`Successfully updated putovanja: ${updateId}`, updated);
+      
+      // Return in Strapi format using ctx.body
+      ctx.body = { data: updated };
+      return ctx.body;
     } catch (error) {
       console.error("Error in putovanja update:", error);
       return ctx.badRequest();
@@ -110,10 +116,16 @@ export default factories.createCoreController("api::putovanja.putovanja", ({ str
       // Use documentId for delete
       const deleteId = entity.documentId || entity.id;
       
+      console.log(`Deleting putovanja with ID: ${deleteId} (original: ${id})`);
+      
       // Delete with documentId
       const deleted = await strapi.entityService.delete("api::putovanja.putovanja", deleteId);
 
-      return { data: deleted };
+      console.log(`Successfully deleted putovanja: ${deleteId}`);
+      
+      // Return in Strapi format using ctx.body
+      ctx.body = { data: deleted };
+      return ctx.body;
     } catch (error) {
       console.error("Error in putovanja delete:", error);
       return ctx.badRequest();

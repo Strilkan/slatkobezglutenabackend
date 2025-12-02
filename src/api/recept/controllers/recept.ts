@@ -69,16 +69,27 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       // Use documentId for update
       const updateId = entity.documentId || entity.id;
       
-      // Update with documentId
+      console.log(`Updating recept ${updateId} (original ID: ${id}) with data:`, ctx.request.body.data);
+      
+      // Update with documentId - use documentId directly
       const updated = await strapi.entityService.update("api::recept.recept", updateId, {
         data: ctx.request.body.data,
         populate: ctx.query.populate || "*",
       });
 
-      return { data: updated };
+      console.log(`Successfully updated recept: ${updateId}`, updated);
+
+      // Return in Strapi format
+      ctx.body = { data: updated };
+      return ctx.body;
     } catch (error) {
       console.error("Error in recept update:", error);
-      return ctx.badRequest();
+      console.error("Update error details:", {
+        id,
+        error: error.message,
+        stack: error.stack
+      });
+      return ctx.badRequest("Update failed");
     }
   },
 
@@ -111,13 +122,24 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       // Use documentId for delete
       const deleteId = entity.documentId || entity.id;
       
+      console.log(`Deleting recept with ID: ${deleteId} (original: ${id})`);
+      
       // Delete with documentId
       const deleted = await strapi.entityService.delete("api::recept.recept", deleteId);
 
-      return { data: deleted };
+      console.log(`Successfully deleted recept: ${deleteId}`);
+      
+      // Return in Strapi format
+      ctx.body = { data: deleted };
+      return ctx.body;
     } catch (error) {
       console.error("Error in recept delete:", error);
-      return ctx.badRequest();
+      console.error("Delete error details:", {
+        id,
+        error: error.message,
+        stack: error.stack
+      });
+      return ctx.badRequest("Delete failed");
     }
   },
 }));
