@@ -43,26 +43,54 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
   async update(ctx) {
     const { id } = ctx.params;
     
+    console.log(`✏️ UPDATE request received for ID: ${id}`);
+    console.log(`✏️ ctx.params:`, ctx.params);
+    console.log(`✏️ ctx.request.method:`, ctx.request.method);
+    console.log(`✏️ ctx.request.url:`, ctx.request.url);
+    
     try {
       // Check if id is numeric or documentId
       const isNumeric = !isNaN(Number(id)) && !isNaN(parseFloat(id));
+      console.log(`✏️ Is numeric ID: ${isNumeric}`);
       
       let entity;
       if (isNumeric) {
-        // Find by numeric id
-        const entities = await strapi.entityService.findMany("api::recept.recept", {
-          filters: { id: Number(id) },
-        });
-        entity = entities?.[0];
+        // Try findOne first (Strapi v5 preferred method)
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", Number(id));
+          console.log(`✏️ Found entity with findOne (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        } catch (findOneErr) {
+          console.log(`✏️ findOne failed, trying findMany:`, findOneErr.message);
+          // Fallback to findMany
+          const entities = await strapi.entityService.findMany("api::recept.recept", {
+            filters: { id: Number(id) },
+          });
+          entity = entities?.[0];
+          console.log(`✏️ Found entity with findMany (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        }
       } else {
-        // For documentId, get all entities and find by documentId
-        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
-          limit: -1,
-        });
-        entity = allEntities.find((e: any) => e.documentId === id);
+        // For documentId, try findOne first
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", id);
+          console.log(`✏️ Found entity with findOne (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        } catch (findOneErr) {
+          console.log(`✏️ findOne failed for documentId, trying findMany:`, findOneErr.message);
+          // Fallback: get all entities and find by documentId
+          const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+            limit: -1,
+          });
+          entity = allEntities.find((e: any) => e.documentId === id);
+          console.log(`✏️ Found entity with findMany (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        }
       }
 
       if (!entity) {
+        console.error(`✏️ Entity not found for ID: ${id} (numeric: ${isNumeric})`);
+        // Try to list all entities to debug
+        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+          limit: 10,
+        });
+        console.log(`✏️ Available entities (first 10):`, allEntities.map((e: any) => ({ id: e.id, documentId: e.documentId, Naslov: e.Naslov })));
         return ctx.notFound();
       }
 
@@ -174,20 +202,42 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       
       let entity;
       if (isNumeric) {
-        // Find by numeric id
-        const entities = await strapi.entityService.findMany("api::recept.recept", {
-          filters: { id: Number(id) },
-        });
-        entity = entities?.[0];
+        // Try findOne first (Strapi v5 preferred method)
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", Number(id));
+          console.log(`🗑️ Found entity with findOne (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        } catch (findOneErr) {
+          console.log(`🗑️ findOne failed, trying findMany:`, findOneErr.message);
+          // Fallback to findMany
+          const entities = await strapi.entityService.findMany("api::recept.recept", {
+            filters: { id: Number(id) },
+          });
+          entity = entities?.[0];
+          console.log(`🗑️ Found entity with findMany (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        }
       } else {
-        // For documentId, get all entities and find by documentId
-        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
-          limit: -1,
-        });
-        entity = allEntities.find((e: any) => e.documentId === id);
+        // For documentId, try findOne first
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", id);
+          console.log(`🗑️ Found entity with findOne (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        } catch (findOneErr) {
+          console.log(`🗑️ findOne failed for documentId, trying findMany:`, findOneErr.message);
+          // Fallback: get all entities and find by documentId
+          const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+            limit: -1,
+          });
+          entity = allEntities.find((e: any) => e.documentId === id);
+          console.log(`🗑️ Found entity with findMany (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        }
       }
 
       if (!entity) {
+        console.error(`🗑️ Entity not found for ID: ${id} (numeric: ${isNumeric})`);
+        // Try to list all entities to debug
+        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+          limit: 10,
+        });
+        console.log(`🗑️ Available entities (first 10):`, allEntities.map((e: any) => ({ id: e.id, documentId: e.documentId, Naslov: e.Naslov })));
         return ctx.notFound();
       }
 
