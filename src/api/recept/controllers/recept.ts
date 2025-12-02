@@ -83,18 +83,27 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
           console.log(`✏️ Found entity with findMany (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
         }
       } else {
-        // For documentId, try findOne first
-        try {
-          entity = await strapi.entityService.findOne("api::recept.recept", id);
-          console.log(`✏️ Found entity with findOne (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
-        } catch (findOneErr) {
-          console.log(`✏️ findOne failed for documentId, trying findMany:`, findOneErr.message);
-          // Fallback: get all entities and find by documentId
-          const allEntities = await strapi.entityService.findMany("api::recept.recept", {
-            limit: -1,
-          });
-          entity = allEntities.find((e: any) => e.documentId === id);
-          console.log(`✏️ Found entity with findMany (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        // For documentId, koristi findMany s filterom (findOne ne radi s documentId u Strapi v5)
+        console.log(`✏️ Searching for entity with documentId: ${id}`);
+        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+          limit: -1,
+        });
+        entity = allEntities.find((e: any) => e.documentId === id);
+        console.log(`✏️ Found entity with findMany filter (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        
+        // Ako nije pronađen, pokušaj s query builder kao fallback
+        if (!entity) {
+          try {
+            const queryResult = await strapi.db.query("api::recept.recept").findOne({
+              where: { documentId: id },
+            });
+            if (queryResult) {
+              entity = queryResult;
+              console.log(`✏️ Found entity with query builder (documentId ${id}):`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov });
+            }
+          } catch (queryErr) {
+            console.log(`✏️ Query builder failed for documentId:`, queryErr.message);
+          }
         }
       }
 
@@ -235,18 +244,27 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
           }
         }
       } else {
-        // For documentId, pokušaj direktno s findOne (preferred u Strapi v5)
-        try {
-          entity = await strapi.entityService.findOne("api::recept.recept", id);
-          console.log(`🗑️ Found entity with findOne (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
-        } catch (findOneErr) {
-          console.log(`🗑️ findOne failed for documentId, trying findMany:`, findOneErr.message);
-          // Fallback: get all entities and find by documentId
-          const allEntities = await strapi.entityService.findMany("api::recept.recept", {
-            limit: -1,
-          });
-          entity = allEntities.find((e: any) => e.documentId === id);
-          console.log(`🗑️ Found entity with findMany (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        // For documentId, koristi findMany s filterom (findOne ne radi s documentId u Strapi v5)
+        console.log(`🗑️ Searching for entity with documentId: ${id}`);
+        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+          limit: -1,
+        });
+        entity = allEntities.find((e: any) => e.documentId === id);
+        console.log(`🗑️ Found entity with findMany filter (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        
+        // Ako nije pronađen, pokušaj s query builder kao fallback
+        if (!entity) {
+          try {
+            const queryResult = await strapi.db.query("api::recept.recept").findOne({
+              where: { documentId: id },
+            });
+            if (queryResult) {
+              entity = queryResult;
+              console.log(`🗑️ Found entity with query builder (documentId ${id}):`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov });
+            }
+          } catch (queryErr) {
+            console.log(`🗑️ Query builder failed for documentId:`, queryErr.message);
+          }
         }
       }
 
