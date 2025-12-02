@@ -70,7 +70,7 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       const updateId = entity.documentId || entity.id;
       
       console.log(`Updating recept ${updateId} (original ID: ${id}, numeric ID: ${entity.id}) with data:`, ctx.request.body.data);
-      console.log(`Entity before update:`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov || entity.attributes?.Naslov });
+      console.log(`Entity before update:`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov });
       
       // Pokušaj update s documentId
       let updated;
@@ -136,8 +136,8 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
         const verified = verifyUpdated[0];
         console.log(`✅ Verified: Recept ${updateId} successfully updated`);
         console.log(`Updated data:`, {
-          Naslov: verified.Naslov || verified.attributes?.Naslov,
-          Istaknuto: verified.Istaknuto || verified.attributes?.Istaknuto,
+          Naslov: verified.Naslov,
+          Istaknuto: verified.Istaknuto,
         });
         // Koristi verificirani entitet ako je drugačiji
         if (!updated || !updated.Naslov) {
@@ -189,7 +189,7 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       const deleteId = entity.documentId || entity.id;
       
       console.log(`Deleting recept with ID: ${deleteId} (original: ${id}, numeric ID: ${entity.id})`);
-      console.log(`Entity to delete:`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov || entity.attributes?.Naslov });
+      console.log(`Entity to delete:`, { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov });
       
       // Pokušaj obrisati - Strapi v5 može koristiti i documentId i numeric ID
       let deleted;
