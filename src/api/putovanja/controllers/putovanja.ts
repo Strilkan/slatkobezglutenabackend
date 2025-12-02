@@ -156,9 +156,15 @@ export default factories.createCoreController("api::putovanja.putovanja", ({ str
   async delete(ctx) {
     const { id } = ctx.params;
     
+    console.log(`🗑️ DELETE request received for ID: ${id}`);
+    console.log(`🗑️ ctx.params:`, ctx.params);
+    console.log(`🗑️ ctx.request.method:`, ctx.request.method);
+    console.log(`🗑️ ctx.request.url:`, ctx.request.url);
+    
     try {
       // Check if id is numeric or documentId
       const isNumeric = !isNaN(Number(id)) && !isNaN(parseFloat(id));
+      console.log(`🗑️ Is numeric ID: ${isNumeric}`);
       
       let entity;
       if (isNumeric) {
