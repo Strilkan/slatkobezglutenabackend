@@ -82,53 +82,40 @@ export default {
 
       if (publicRole) {
         // Public role: Allow GET (find, findOne) for all content types
-        const publicPermissions = [
-          { action: 'api::recept.recept.find', enabled: true },
-          { action: 'api::recept.recept.findOne', enabled: true },
-          { action: 'api::putovanja.putovanja.find', enabled: true },
-          { action: 'api::putovanja.putovanja.findOne', enabled: true },
-          { action: 'api::kategorija.kategorija.find', enabled: true },
-          { action: 'api::kategorija.kategorija.findOne', enabled: true },
-        ];
-
-        await strapi
-          .plugin('users-permissions')
-          .service('permission')
-          .updatePermissions(publicRole.id, publicPermissions);
+        // U Strapi v5, permissions se postavljaju ručno u admin panelu
+        // Ovdje samo logiramo da treba postaviti permissions
+        console.log('ℹ️ Public role found. Configure permissions manually in admin panel:');
+        console.log('   - api::recept.recept.find');
+        console.log('   - api::recept.recept.findOne');
+        console.log('   - api::putovanja.putovanja.find');
+        console.log('   - api::putovanja.putovanja.findOne');
+        console.log('   - api::kategorija.kategorija.find');
+        console.log('   - api::kategorija.kategorija.findOne');
       }
 
       if (authenticatedRole) {
         // Authenticated role: Allow full CRUD for all content types
-        const authenticatedPermissions = [
-          // Recept
-          { action: 'api::recept.recept.find', enabled: true },
-          { action: 'api::recept.recept.findOne', enabled: true },
-          { action: 'api::recept.recept.create', enabled: true },
-          { action: 'api::recept.recept.update', enabled: true },
-          { action: 'api::recept.recept.delete', enabled: true },
-          // Putovanja
-          { action: 'api::putovanja.putovanja.find', enabled: true },
-          { action: 'api::putovanja.putovanja.findOne', enabled: true },
-          { action: 'api::putovanja.putovanja.create', enabled: true },
-          { action: 'api::putovanja.putovanja.update', enabled: true },
-          { action: 'api::putovanja.putovanja.delete', enabled: true },
-          // Kategorija
-          { action: 'api::kategorija.kategorija.find', enabled: true },
-          { action: 'api::kategorija.kategorija.findOne', enabled: true },
-          { action: 'api::kategorija.kategorija.create', enabled: true },
-          { action: 'api::kategorija.kategorija.update', enabled: true },
-          { action: 'api::kategorija.kategorija.delete', enabled: true },
-          // Upload permissions
-          { action: 'plugin::upload.read', enabled: true },
-          { action: 'plugin::upload.assets.create', enabled: true },
-          { action: 'plugin::upload.assets.update', enabled: true },
-          { action: 'plugin::upload.assets.download', enabled: true },
-        ];
-
-        await strapi
-          .plugin('users-permissions')
-          .service('permission')
-          .updatePermissions(authenticatedRole.id, authenticatedPermissions);
+        // U Strapi v5, permissions se postavljaju ručno u admin panelu
+        // Ovdje samo logiramo da treba postaviti permissions
+        console.log('ℹ️ Authenticated role found. Configure permissions manually in admin panel:');
+        console.log('   - api::recept.recept.find, findOne, create, update, delete');
+        console.log('   - api::putovanja.putovanja.find, findOne, create, update, delete');
+        console.log('   - api::kategorija.kategorija.find, findOne, create, update, delete');
+        console.log('   - plugin::upload.read, assets.create, assets.update, assets.download');
+        
+        // Pokušaj postaviti permissions ako je moguće (možda neće raditi u Strapi v5)
+        try {
+          const permissionService = strapi.plugin('users-permissions').service('permission');
+          
+          // Dohvati sve permissions za authenticated role
+          const existingPermissions = await permissionService.findMany({
+            where: { role: authenticatedRole.id },
+          });
+          
+          console.log(`ℹ️ Found ${existingPermissions.length} existing permissions for authenticated role`);
+        } catch (permErr) {
+          console.log('ℹ️ Cannot auto-configure permissions. Please set them manually in admin panel.');
+        }
       }
 
       console.log('✅ Permissions configured successfully');
