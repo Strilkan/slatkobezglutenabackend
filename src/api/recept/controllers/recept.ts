@@ -14,19 +14,33 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       
       let entity;
       if (isNumeric) {
-        // Find by numeric id
-        const entities = await strapi.entityService.findMany("api::recept.recept", {
-          filters: { id: Number(id) },
-          populate: ctx.query.populate || "*",
-        });
-        entity = entities?.[0];
+        // Try findOne first (Strapi v5 preferred method)
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", Number(id), {
+            populate: ctx.query.populate || "*",
+          });
+        } catch (findOneErr) {
+          // Fallback to findMany
+          const entities = await strapi.entityService.findMany("api::recept.recept", {
+            filters: { id: Number(id) },
+            populate: ctx.query.populate || "*",
+          });
+          entity = entities?.[0];
+        }
       } else {
-        // For documentId, get all entities and find by documentId
-        const allEntities = await strapi.entityService.findMany("api::recept.recept", {
-          populate: ctx.query.populate || "*",
-          limit: -1, // Get all
-        });
-        entity = allEntities.find((e: any) => e.documentId === id);
+        // For documentId, try findOne first
+        try {
+          entity = await strapi.entityService.findOne("api::recept.recept", id, {
+            populate: ctx.query.populate || "*",
+          });
+        } catch (findOneErr) {
+          // Fallback: get all entities and find by documentId
+          const allEntities = await strapi.entityService.findMany("api::recept.recept", {
+            populate: ctx.query.populate || "*",
+            limit: -1, // Get all
+          });
+          entity = allEntities.find((e: any) => e.documentId === id);
+        }
       }
 
       if (!entity) {
@@ -201,22 +215,27 @@ export default factories.createCoreController("api::recept.recept", ({ strapi })
       console.log(`🗑️ Is numeric ID: ${isNumeric}`);
       
       let entity;
+      // U Strapi v5, findOne možda ne radi direktno s numeric ID-om
+      // Pokušaj prvo s findMany da pronađemo entitet, zatim koristi documentId za findOne
       if (isNumeric) {
-        // Try findOne first (Strapi v5 preferred method)
-        try {
-          entity = await strapi.entityService.findOne("api::recept.recept", Number(id));
-          console.log(`🗑️ Found entity with findOne (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
-        } catch (findOneErr) {
-          console.log(`🗑️ findOne failed, trying findMany:`, findOneErr.message);
-          // Fallback to findMany
-          const entities = await strapi.entityService.findMany("api::recept.recept", {
-            filters: { id: Number(id) },
-          });
-          entity = entities?.[0];
-          console.log(`🗑️ Found entity with findMany (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        // Prvo pokušaj pronaći entitet s findMany
+        const entities = await strapi.entityService.findMany("api::recept.recept", {
+          filters: { id: Number(id) },
+        });
+        entity = entities?.[0];
+        console.log(`🗑️ Found entity with findMany (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+        
+        // Ako nije pronađen, pokušaj s findOne direktno (možda radi u nekim slučajevima)
+        if (!entity) {
+          try {
+            entity = await strapi.entityService.findOne("api::recept.recept", Number(id));
+            console.log(`🗑️ Found entity with findOne (numeric ID ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
+          } catch (findOneErr) {
+            console.log(`🗑️ findOne failed with numeric ID:`, findOneErr.message);
+          }
         }
       } else {
-        // For documentId, try findOne first
+        // For documentId, pokušaj direktno s findOne (preferred u Strapi v5)
         try {
           entity = await strapi.entityService.findOne("api::recept.recept", id);
           console.log(`🗑️ Found entity with findOne (documentId ${id}):`, entity ? { id: entity.id, documentId: entity.documentId, Naslov: entity.Naslov } : "NOT FOUND");
